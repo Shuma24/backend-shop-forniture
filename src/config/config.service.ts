@@ -16,7 +16,7 @@ export class ConfigService implements IConfigService {
 
     this.config = parsed;
 
-    this.Logger.log('ConfigService is loaded.');
+    this.Logger.info('ConfigService is loaded.');
   }
   get(key: string): string {
     const result = this.config[key];

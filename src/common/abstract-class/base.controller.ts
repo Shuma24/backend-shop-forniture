@@ -9,8 +9,8 @@ export abstract class BaseController {
   }
 
   protected bindRouts(routes: RouteOptions[]) {
-    routes.forEach((route: RouteOptions) => {
-      this.logger.log(`Route ${route.method} ${route.url} is binded`);
+    routes.forEach((route) => {
+      this.logger.info(`Route ${route.method} ${route.url} is binded`);
       this._route = [...this._route, route];
     });
   }

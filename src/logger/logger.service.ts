@@ -9,7 +9,7 @@ export class LoggerService implements ILoggerService {
     this.Logger = winston.createLogger(logConfiguration);
   }
 
-  log(message: string): void {
+  info(message: string): void {
     this.Logger.log('info', message);
   }
 
