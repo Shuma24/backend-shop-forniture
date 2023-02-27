@@ -3,7 +3,7 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { injected } from 'brandi';
 import fastify, { FastifyInstance } from 'fastify';
 import mongoose, { Mongoose } from 'mongoose';
-import { IAuthService } from '../auth/interfaces/auth.service.interface';
+
 import { BaseController } from '../common/abstract-class/base.controller';
 import { IConfigService } from '../config/config.service.interface';
 import { TOKENS } from '../containers/Symbols';

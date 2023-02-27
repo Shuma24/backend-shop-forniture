@@ -6,7 +6,11 @@ import { BaseController } from '../common/abstract-class/base.controller';
 import { HttpResponseCode } from '../common/constants/HttpResponseCode';
 import { TOKENS } from '../containers/Symbols';
 import { ILoggerService } from '../logger/logger.service.interface';
-import { RegistrationUserDto, UserRegistrationBody } from '../user/dto/registration-user.dto';
+import {
+  RegistrationResponse,
+  RegistrationUserDto,
+  UserRegistrationBody,
+} from '../user/dto/registration-user.dto';
 import { IAuthService } from './interfaces/auth.service.interface';
 
 export class AuthController extends BaseController {
@@ -21,12 +25,12 @@ export class AuthController extends BaseController {
         schema: {
           body: RegistrationUserDto,
           response: {
-            200: RegistrationUserDto,
+            201: RegistrationResponse,
           },
         },
       },
       {
-        method: 'POST',
+        method: 'GET',
         url: '/login',
         handler: this.login.bind(this),
         schema: {},
@@ -50,7 +54,7 @@ export class AuthController extends BaseController {
   }
 
   async login(req: FastifyRequest, reply: FastifyReply) {
-    return reply.send(this.authService.login()).code(HttpResponseCode.BAD_REQUEST);
+    return reply.send(req.socket.remoteAddress);
   }
 }
 

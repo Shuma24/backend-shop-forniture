@@ -22,6 +22,10 @@ export class UserEntity implements IUser {
     return this;
   }
 
+  public async checkPassword(password: string): Promise<boolean> {
+    return compare(password, this.passwordHash);
+  }
+
   public async validatePassword(password: string): Promise<boolean> {
     return await compare(password, this.passwordHash);
   }

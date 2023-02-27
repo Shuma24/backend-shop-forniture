@@ -13,7 +13,7 @@ export class UserRepository {
   }
 
   async findUserByEmail(email: string) {
-    const user = await userModel.find({ email: email }).exec();
+    const user = await userModel.findOne({ email: email }).exec();
     return user;
   }
 
