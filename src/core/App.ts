@@ -3,7 +3,8 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { injected } from 'brandi';
 import fastify, { FastifyInstance } from 'fastify';
 import mongoose, { Mongoose } from 'mongoose';
-
+import type { FastifyCookieOptions } from '@fastify/cookie';
+import cookie from '@fastify/cookie';
 import { BaseController } from '../common/abstract-class/base.controller';
 import { IConfigService } from '../config/config.service.interface';
 import { TOKENS } from '../containers/Symbols';
@@ -52,16 +53,29 @@ export class Application {
     await this.app.register(cors, option);
   }
 
+  async cookie() {
+    await this.app.register(cookie, {
+      secret: this.configService.get('COOKIE_SECRET'),
+      parseOptions: {
+        httpOnly: true,
+        secure: false,
+        path: '/',
+        sameSite: 'strict',
+      },
+    } as FastifyCookieOptions);
+  }
+
   init() {
-    this.app.listen({ port: this.port, path: '0.0.0.0' }, (err: Error | null, adress: string) => {
+    this.app.listen({ port: this.port, path: '0.0.0.0' }, (err: Error | null, address: string) => {
       if (err) {
         this.Logger.error(err.message);
         process.exit(1);
       }
-      this.Logger.info(`Server is running on ${adress}`);
+      this.Logger.info(`Server is running on ${address}`);
     });
     this.connectDataBase();
     this.bindRouts();
+    this.cookie();
   }
 }
 

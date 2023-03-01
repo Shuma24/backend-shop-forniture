@@ -1,5 +1,6 @@
 import { token } from 'brandi';
 import { IAuthService } from '../auth/interfaces/auth.service.interface';
+import { IJWTService } from '../auth/interfaces/jwt.service.interface';
 import { BaseController } from '../common/abstract-class/base.controller';
 import { IConfigService } from '../config/config.service.interface';
 import { Application } from '../core/App';
@@ -16,4 +17,5 @@ export const TOKENS = {
   AuthController: token<BaseController>('AuthController'),
   UserRepository: token<UserRepository>('UserRepository'),
   AuthService: token<IAuthService>('AuthorizationService'),
+  JWTService: token<IJWTService>('JWTService'),
 };

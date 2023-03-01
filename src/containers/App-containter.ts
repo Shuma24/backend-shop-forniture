@@ -1,6 +1,7 @@
 import { Container } from 'brandi';
 import { AuthController } from '../auth/auth.controller';
 import { AuthService } from '../auth/auth.service';
+import { JWTService } from '../auth/jwt.service';
 import { ConfigService } from '../config/config.service';
 import { Application } from '../core/App';
 import { LoggerService } from '../logger/logger.service';
@@ -20,5 +21,6 @@ export class AppModule extends Container {
     this.bind(TOKENS.AuthController).toInstance(AuthController).inSingletonScope();
     this.bind(TOKENS.UserRepository).toInstance(UserRepository).inSingletonScope();
     this.bind(TOKENS.AuthService).toInstance(AuthService).inSingletonScope();
+    this.bind(TOKENS.JWTService).toInstance(JWTService).inSingletonScope();
   }
 }
