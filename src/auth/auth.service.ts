@@ -76,8 +76,25 @@ export class AuthService implements IAuthService {
   }
   async login(id: Types.ObjectId, deviceId: string) {
     try {
+      const user = await this.userRepository.findUserById(id.toString());
+
+      if (!user) {
+        throw new Error(userErrors.PROBLEM_WITH_LOGIN);
+      }
+
       const { accessToken, refreshToken } = this.jwtService.generateTokens(id.toString(), deviceId);
       const setTokenInfo = await this.userRepository.setToken(id, refreshToken, deviceId);
+
+      user.refreshTokens = user.refreshTokens?.filter(
+        (el) => el.token !== refreshToken && el.deviceId !== deviceId,
+      );
+
+      const timeNow = new Date(Date.now());
+      user.refreshTokens = user.refreshTokens?.filter((el) => {
+        return timeNow < el.tokenDieDate;
+      });
+
+      await user.save();
 
       if (!setTokenInfo.acknowledged) {
         throw new Error(userErrors.PROBLEM_WITH_LOGIN);
@@ -94,7 +111,7 @@ export class AuthService implements IAuthService {
   async refresh(userRefreshToken: string) {
     try {
       const user = await this.userRepository.findUserByToken(userRefreshToken);
-      console.log(user);
+
       if (!user) {
         throw new Error(userErrors.PROBLEM_WITH_LOGIN);
       }

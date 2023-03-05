@@ -5,6 +5,7 @@
   "main": "main.js",
   "author": "Shuma24 <pavloshuma@gmail.com>",
   "license": "ISC",
+  "types": "index.d.ts",
   "scripts": {
     "start": "node ./dist/main.js",
     "start:dev": "nodemon",

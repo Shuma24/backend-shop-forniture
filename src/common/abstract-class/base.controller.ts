@@ -1,4 +1,4 @@
-import { RouteOptions } from 'fastify';
+import { preHandlerHookHandler, RouteOptions } from 'fastify';
 import { ILoggerService } from '../../logger/logger.service.interface';
 
 export abstract class BaseController {
@@ -8,10 +8,27 @@ export abstract class BaseController {
     this._route = [];
   }
 
-  protected bindRouts(routes: RouteOptions[]) {
+  protected bindRouts(routes: RouteOptions[]): void {
     routes.forEach((route) => {
       this.logger.info(`Route ${route.method} ${route.url} is binded`);
+
       this._route = [...this._route, route];
+    });
+  }
+
+  bindPreHandler(hook: preHandlerHookHandler) {
+    this._route = this._route.map((route) => {
+      if (route.preHandler && Array.isArray(route.preHandler)) {
+        route.preHandler.unshift(hook);
+      }
+
+      if (!route.preHandler) {
+        route.preHandler = hook;
+      }
+
+      return {
+        ...route,
+      };
     });
   }
 

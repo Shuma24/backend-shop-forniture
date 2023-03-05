@@ -10,6 +10,7 @@ import { IConfigService } from '../config/config.service.interface';
 import { TOKENS } from '../containers/Symbols';
 import { ILoggerService } from '../logger/logger.service.interface';
 import { IDBService } from '../mongo/db.interface';
+import { IAuthHooks } from '../hooks/interfaces/user-hook.interface';
 
 export class Application {
   app: FastifyInstance;
@@ -23,6 +24,7 @@ export class Application {
     private readonly userController: BaseController,
     private readonly dbService: IDBService,
     private readonly authController: BaseController,
+    private readonly AuthHooks: IAuthHooks,
   ) {
     this.app = fastify().withTypeProvider<TypeBoxTypeProvider>();
     this.port = Number(configService.get('PORT')) || 5000;
@@ -32,6 +34,7 @@ export class Application {
 
   bindRouts() {
     this.routes.forEach((controllers) => {
+      controllers.bindPreHandler(this.AuthHooks.execute.bind(this.AuthHooks));
       controllers.route.forEach((route) => {
         this.app.route(route);
       });
@@ -86,4 +89,5 @@ injected(
   TOKENS.UserController,
   TOKENS.DBService,
   TOKENS.AuthController,
+  TOKENS.AuthHooks,
 );

@@ -23,7 +23,7 @@ export class UserRepository {
   }
 
   async deleteUser(id: string) {
-    return await userModel.deleteOne({ id: id }).exec();
+    return await userModel.deleteOne({ _id: id }).exec();
   }
 
   async setToken(id: Types.ObjectId, token: string, deviceId: string) {

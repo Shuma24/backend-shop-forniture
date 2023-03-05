@@ -8,6 +8,7 @@ import { HttpResponseCode } from '../common/constants/HttpResponseCode';
 import { TOKENS } from '../containers/Symbols';
 import { ILoggerService } from '../logger/logger.service.interface';
 import { LoginResponseDto, LoginUserDto, UserLoginBody } from '../user/dto/login-user.dto';
+import { LogoutResponseDto } from '../user/dto/logout-response.dto';
 import {
   RegistrationResponse,
   RegistrationUserDto,
@@ -23,7 +24,7 @@ export class AuthController extends BaseController {
     this.bindRouts([
       <RouteOptions>{
         method: 'POST',
-        url: '/register',
+        url: '/auth/register',
         handler: this.registration.bind(this),
         schema: {
           body: RegistrationUserDto,
@@ -34,7 +35,7 @@ export class AuthController extends BaseController {
       },
       <RouteOptions>{
         method: 'POST',
-        url: '/login',
+        url: '/auth/login',
         handler: this.login.bind(this),
         schema: {
           body: LoginUserDto,
@@ -45,7 +46,7 @@ export class AuthController extends BaseController {
       },
       {
         method: 'POST',
-        url: '/refresh',
+        url: '/auth/refresh',
         handler: this.refresh.bind(this),
         schema: {
           response: {
@@ -53,9 +54,19 @@ export class AuthController extends BaseController {
           },
         },
       },
+      {
+        method: 'POST',
+        url: '/auth/logout',
+        handler: this.logout.bind(this),
+        schema: {
+          response: {
+            200: LogoutResponseDto,
+          },
+        },
+      },
     ]);
 
-    this.Logger.info('AuthController is loaded.');
+    this.Logger.info('AuthController is initialized.');
   }
 
   async registration(req: FastifyRequest<{ Body: UserRegistrationBody }>, reply: FastifyReply) {
@@ -107,13 +118,11 @@ export class AuthController extends BaseController {
     } catch (error) {
       if (error instanceof Error) {
         this.Logger.error(error.message);
-        return reply
-          .code(HttpResponseCode.UNAUTHORIZED)
-          .send({
-            status: false,
-            statusCode: HttpResponseCode.UNAUTHORIZED,
-            message: error.message,
-          });
+        return reply.code(HttpResponseCode.UNAUTHORIZED).send({
+          status: false,
+          statusCode: HttpResponseCode.UNAUTHORIZED,
+          message: error.message,
+        });
       }
     }
   }
@@ -138,6 +147,31 @@ export class AuthController extends BaseController {
         })
         .code(HttpResponseCode.OK)
         .send({ status: true, statusCode: HttpResponseCode.OK, accessToken: tokens.accessToken });
+    } catch (error) {
+      if (error instanceof Error) {
+        this.Logger.error(error.message);
+        return reply.code(HttpResponseCode.UNAUTHORIZED).send({
+          status: false,
+          statusCode: HttpResponseCode.UNAUTHORIZED,
+          message: error.message,
+        });
+      }
+    }
+  }
+
+  async logout(req: FastifyRequest, reply: FastifyReply) {
+    try {
+      const { refreshToken } = req.cookies;
+
+      if (!refreshToken) {
+        throw new Error(userErrors.UNAUTHORIZED);
+      }
+
+      return reply
+        .header('Authorization', 'Bearer')
+        .clearCookie('refreshToken')
+        .code(HttpResponseCode.OK)
+        .send({ status: true, statusCode: HttpResponseCode.OK });
     } catch (error) {
       if (error instanceof Error) {
         this.Logger.error(error.message);
