@@ -64,8 +64,8 @@ export class S3Storage implements IStorage {
 
       if (data.Bucket && data.Key && data.Location) {
         result = {
-          url: data.Key,
-          filename: data.Location,
+          url: data.Location,
+          filename: data.Key,
         };
 
         return result;
