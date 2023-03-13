@@ -1,7 +1,7 @@
 import cors, { FastifyCorsOptions } from '@fastify/cors';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { injected } from 'brandi';
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance, FastifyPluginCallback, FastifyRegisterOptions } from 'fastify';
 import mongoose, { Mongoose } from 'mongoose';
 import type { FastifyCookieOptions } from '@fastify/cookie';
 import cookie from '@fastify/cookie';
@@ -25,11 +25,12 @@ export class Application {
     private readonly dbService: IDBService,
     private readonly authController: BaseController,
     private readonly AuthHooks: IAuthHooks,
+    private readonly ProductController: BaseController,
   ) {
     this.app = fastify().withTypeProvider<TypeBoxTypeProvider>();
     this.port = Number(configService.get('PORT')) || 5000;
     this.mongoClient = mongoose;
-    this.routes = [userController, authController];
+    this.routes = [userController, authController, ProductController];
   }
 
   bindRouts() {
@@ -68,6 +69,10 @@ export class Application {
     } as FastifyCookieOptions);
   }
 
+  registerSync<T>(plugin: FastifyPluginCallback, options?: FastifyRegisterOptions<T>) {
+    this.app.register(plugin, options);
+  }
+
   init() {
     this.app.listen({ port: this.port, path: '0.0.0.0' }, (err: Error | null, address: string) => {
       if (err) {
@@ -90,4 +95,5 @@ injected(
   TOKENS.DBService,
   TOKENS.AuthController,
   TOKENS.AuthHooks,
+  TOKENS.ProductController,
 );

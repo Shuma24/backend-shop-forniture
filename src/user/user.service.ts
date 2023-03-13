@@ -1,11 +1,11 @@
 import { injected } from 'brandi';
-import { userErrors } from '../../common/constants/Errors';
-import { TOKENS } from '../../containers/Symbols';
-import { ILoggerService } from '../../logger/logger.service.interface';
-import { UserEntity } from '../entity/user.entity';
-import { IUserService } from '../interfaces/user-service.interface';
-import { IUser } from '../interfaces/user.interface';
-import { UserRepository } from '../repository/user.repository';
+import { userErrors } from '../common/constants/Errors';
+import { TOKENS } from '../containers/Symbols';
+import { ILoggerService } from '../logger/logger.service.interface';
+import { UserEntity } from './entity/user.entity';
+import { IUserService } from './interfaces/user-service.interface';
+import { IUser } from './interfaces/user.interface';
+import { UserRepository } from './repository/user.repository';
 
 export class UserService implements IUserService {
   constructor(

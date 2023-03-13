@@ -1,6 +1,7 @@
 import { token } from 'brandi';
 import { IAuthService } from '../auth/interfaces/auth.service.interface';
 import { IJWTService } from '../auth/interfaces/jwt.service.interface';
+import { IStorage } from '../aws/interfaces/storage.interface';
 import { BaseController } from '../common/abstract-class/base.controller';
 import { IConfigService } from '../config/config.service.interface';
 import { Application } from '../core/App';
@@ -8,6 +9,8 @@ import { IAuthHooks } from '../hooks/interfaces/user-hook.interface';
 
 import { ILoggerService } from '../logger/logger.service.interface';
 import { IDBService } from '../mongo/db.interface';
+import { IProductService } from '../product/interfaces/product-service.interface';
+import { ProductRepository } from '../product/repository/product.repository';
 import { IUserService } from '../user/interfaces/user-service.interface';
 import { UserRepository } from '../user/repository/user.repository';
 
@@ -23,4 +26,8 @@ export const TOKENS = {
   JWTService: token<IJWTService>('JWTService'),
   AuthHooks: token<IAuthHooks>('AuthHooks'),
   UserService: token<IUserService>('UserService'),
+  ProductController: token<BaseController>('ProductController'),
+  ProductService: token<IProductService>('ProductService'),
+  ProductRepository: token<ProductRepository>('ProductRepository'),
+  BucketStorage: token<IStorage>('BucketStorage'),
 };

@@ -3,18 +3,18 @@ import { RouteOptions } from 'fastify';
 import { FastifyReply } from 'fastify/types/reply';
 import { FastifyRequest } from 'fastify/types/request';
 
-import { BaseController } from '../../common/abstract-class/base.controller';
-import { userErrors } from '../../common/constants/Errors';
-import { HttpResponseCode } from '../../common/constants/HttpResponseCode';
-import { TOKENS } from '../../containers/Symbols';
-import { IAuthHooks } from '../../hooks/interfaces/user-hook.interface';
+import { BaseController } from '../common/abstract-class/base.controller';
+import { userErrors } from '../common/constants/Errors';
+import { HttpResponseCode } from '../common/constants/HttpResponseCode';
+import { TOKENS } from '../containers/Symbols';
+import { IAuthHooks } from '../hooks/interfaces/user-hook.interface';
 
-import { ILoggerService } from '../../logger/logger.service.interface';
-import { IUserController } from '../interfaces/user.controller.interface';
-import { deleteUserResponseDTO } from '../dto/delete.dto';
-import { ProfileResponseDto } from '../dto/profile-response.dto';
-import { IUserService } from '../interfaces/user-service.interface';
-import { updateResponseDTO, updateUserBodyDTO, updateUserDTO } from '../dto/update.user.dto';
+import { ILoggerService } from '../logger/logger.service.interface';
+import { IUserController } from './interfaces/user.controller.interface';
+import { deleteUserResponseDTO } from './dto/delete.dto';
+import { ProfileResponseDto } from './dto/profile-response.dto';
+import { IUserService } from './interfaces/user-service.interface';
+import { updateResponseDTO, updateUserBodyDTO, updateUserDTO } from './dto/update.user.dto';
 
 export class UserController extends BaseController implements IUserController {
   constructor(

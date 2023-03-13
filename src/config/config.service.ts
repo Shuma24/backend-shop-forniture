@@ -20,7 +20,7 @@ export class ConfigService implements IConfigService {
   }
   get(key: string): string {
     const result = this.config[key];
-    if (!result) throw new Error('Key is required.');
+    if (!result) throw new Error('ENV Key is required.');
 
     return result;
   }
