@@ -23,4 +23,6 @@ export const productErrors = {
   ERROR_WHILE_CREATING_PRODUCT: 'Error while creating product',
   ERROR_WHILE_GETTING_PRODUCTS: 'Error while getting products',
   ERROR_CATEGORY_NOT_FOUND: 'Error category not found',
+  ERROR_PRODUCT_ID_NOT_FOUND: 'Error product id not found',
+  ERROR_CATEGORY_NAME_NOT_FOUND: 'Error category name not found',
 };

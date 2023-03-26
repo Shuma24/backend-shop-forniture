@@ -1,6 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { IProduct } from '../interfaces/product-schema.interface';
 import { Category } from './category.schema';
+
+export type productDocument = HydratedDocument<IProduct>;
 
 const productSchema = new mongoose.Schema<IProduct>({
   id: { auto: true, type: String },

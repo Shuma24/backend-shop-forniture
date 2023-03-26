@@ -6,6 +6,7 @@ const categorySchema = new mongoose.Schema<ICategory>({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
 });
 

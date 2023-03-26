@@ -29,8 +29,36 @@ export class ProductRepository {
     return await instance.save();
   }
 
-  async findAll() {
-    return await Product.find().exec();
+  async findAll(
+    page?: number,
+    limit?: number,
+    search?: string,
+    getBy?: string,
+    sortBy?: 'asc' | 'desc',
+  ) {
+    let query = {};
+
+    if (search) {
+      query = { name: { $regex: search, $options: 'i' } };
+    }
+
+    if (getBy && sortBy) {
+      query = { [getBy]: sortBy };
+    }
+
+    const currentPage: number = page || 1;
+
+    const limits: number = limit || 4;
+
+    const total = await Product.find(query).count();
+
+    const skipAmount = (currentPage - 1) * limits;
+
+    const products = await Product.find(query).sort(query).skip(skipAmount).limit(limits).exec();
+
+    const lastPage = Math.ceil(total / limits);
+
+    return { products, lastPage, total, currentPage, limits };
   }
 
   async findOne(productId: string) {
@@ -43,5 +71,22 @@ export class ProductRepository {
 
   async findCategoryByName(name: string) {
     return await Category.findOne({ name: name }).exec();
+  }
+
+  async findProductsByCategory(id: string, page?: number, limit?: number) {
+    const total: number = await Product.find({ category: id }).count();
+    const currentPage: number = page || 1;
+    const limits: number = limit || 4;
+    const skipAmount = (currentPage - 1) * limits;
+
+    const products = await Product.find({ category: id }).skip(skipAmount).limit(limits).exec();
+
+    const lastPage = Math.ceil(total / limits);
+
+    return { products, lastPage, total, currentPage, limits };
+  }
+
+  async findAllCategories() {
+    return await Category.find().exec();
   }
 }

@@ -3,8 +3,6 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { injected } from 'brandi';
 import fastify, { FastifyInstance, FastifyPluginCallback, FastifyRegisterOptions } from 'fastify';
 import mongoose, { Mongoose } from 'mongoose';
-import type { FastifyCookieOptions } from '@fastify/cookie';
-import cookie from '@fastify/cookie';
 import { BaseController } from '../common/abstract-class/base.controller';
 import { IConfigService } from '../config/config.service.interface';
 import { TOKENS } from '../containers/Symbols';
@@ -57,18 +55,6 @@ export class Application {
     await this.app.register(cors, option);
   }
 
-  async cookie() {
-    await this.app.register(cookie, {
-      secret: this.configService.get('COOKIE_SECRET'),
-      parseOptions: {
-        httpOnly: true,
-        secure: false,
-        path: '/',
-        sameSite: 'strict',
-      },
-    } as FastifyCookieOptions);
-  }
-
   registerSync<T>(plugin: FastifyPluginCallback, options?: FastifyRegisterOptions<T>) {
     this.app.register(plugin, options);
   }
@@ -83,7 +69,6 @@ export class Application {
     });
     this.connectDataBase();
     this.bindRouts();
-    this.cookie();
   }
 }
 

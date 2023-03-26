@@ -20,3 +20,11 @@ export interface IProduct {
   category: ICategory;
   images: IArrayImages[];
 }
+
+export interface IProducts {
+  products: IProduct[];
+  lastPage: number;
+  total: number;
+  currentPage: number;
+  limits: number;
+}

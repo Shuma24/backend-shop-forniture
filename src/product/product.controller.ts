@@ -6,10 +6,28 @@ import { productErrors } from '../common/constants/Errors';
 import { HttpResponseCode } from '../common/constants/HttpResponseCode';
 import { TOKENS } from '../containers/Symbols';
 import { ILoggerService } from '../logger/logger.service.interface';
-import { CreateCategoryBody, CreateCategoryDto, CreateCategoryResponse } from './dto/category.dto';
-import { CreateProductDto, productBodyDTO } from './dto/product.dto';
+import {
+  categoriesResponse,
+  CreateCategoryBody,
+  CreateCategoryDto,
+  CreateCategoryResponse,
+} from './dto/category.dto';
+import {
+  CreateProductDto,
+  ProductResponse,
+  productBodyDTO,
+  findOneParams,
+  findOneParamsDto,
+  findByCategoryIdParams,
+  findByCategoryByIdParamsDto,
+  ProductResponseArray,
+  queryParamsFindCategory,
+  queryParamsFindCategoryDto,
+  queryParamsAllProducts,
+  queryParamsAllProductsDto,
+} from './dto/product.dto';
 import { IProductController } from './interfaces/product-controller.interface';
-import { inputFiles, IProductService } from './interfaces/product-service.interface';
+import { IProductService } from './interfaces/product-service.interface';
 import { IDimensions } from './interfaces/product-schema.interface';
 
 export class ProductController extends BaseController implements IProductController {
@@ -36,17 +54,53 @@ export class ProductController extends BaseController implements IProductControl
         url: '/product/create-product',
         handler: this.createProduct.bind(this),
         schema: {
-          body: {
-            type: 'object',
-            required: ['name', 'description', 'price', 'dimensions', 'category', 'files'],
-            properties: {
-              name: { type: 'string' },
-              description: { type: 'string' },
-              price: { type: 'string' },
-              dimensions: { type: 'string' },
-              category: { type: 'string' },
-              files: { type: 'array' },
-            },
+          body: CreateProductDto,
+          response: {
+            200: ProductResponse,
+          },
+        },
+      },
+      <RouteOptions>{
+        method: 'GET',
+        url: '/product/:id',
+        handler: this.findOne.bind(this),
+        schema: {
+          params: findOneParams,
+          response: {
+            200: ProductResponse,
+          },
+        },
+      },
+      <RouteOptions>{
+        method: 'GET',
+        url: '/product/category/:category',
+        handler: this.findProductsByCategory.bind(this),
+        schema: {
+          querystring: queryParamsFindCategory,
+          params: findByCategoryIdParams,
+          response: {
+            200: ProductResponseArray,
+          },
+        },
+      },
+      <RouteOptions>{
+        method: 'GET',
+        url: '/product/all',
+        handler: this.findAll.bind(this),
+        schema: {
+          querystring: queryParamsAllProducts,
+          response: {
+            200: ProductResponseArray,
+          },
+        },
+      },
+      <RouteOptions>{
+        method: 'GET',
+        url: '/product/all-category',
+        handler: this.findAllCategory.bind(this),
+        schema: {
+          response: {
+            200: categoriesResponse,
           },
         },
       },
@@ -104,7 +158,7 @@ export class ProductController extends BaseController implements IProductControl
         req.body.files,
       );
 
-      return reply.send({ status: true, createdProduct: product }).code(HttpResponseCode.CREATED);
+      return reply.send({ status: true, ...product }).code(HttpResponseCode.CREATED);
     } catch (error) {
       if (error instanceof Error) {
         return reply.status(500).send({ status: false, message: error.message });
@@ -112,12 +166,83 @@ export class ProductController extends BaseController implements IProductControl
     }
   }
 
-  async findAll(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-    console.log('hello');
+  async findAll(
+    req: FastifyRequest<{ Querystring: queryParamsAllProductsDto }>,
+    reply: FastifyReply,
+  ): Promise<void> {
+    try {
+      const asc = req.query.sortBy === 'asc' ? 'asc' : undefined;
+      const desc = req.query.sortBy === 'desc' ? 'desc' : undefined;
+
+      const products = await this.ProductService.findAll(
+        req.query.page,
+        req.query.limit,
+        req.query.search,
+        req.query.getBy,
+        asc || desc,
+      );
+
+      return reply.send({ status: true, ...products }).code(HttpResponseCode.OK);
+    } catch (error) {
+      if (error instanceof Error) {
+        return reply.status(500).send({ status: false, message: error.message });
+      }
+    }
   }
 
-  async findOne(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-    console.log('hello');
+  async findOne(req: FastifyRequest<{ Params: findOneParamsDto }>, reply: FastifyReply) {
+    try {
+      if (!req.params.id) {
+        return reply
+          .send({ status: false, message: productErrors.ERROR_PRODUCT_ID_NOT_FOUND })
+          .code(HttpResponseCode.NOT_FOUND);
+      }
+      const product = await this.ProductService.findOne(req.params.id);
+
+      return reply.send({ status: true, ...product }).code(HttpResponseCode.OK);
+    } catch (error) {
+      if (error instanceof Error) {
+        return reply.status(500).send({ status: false, message: error.message });
+      }
+    }
+  }
+
+  async findProductsByCategory(
+    req: FastifyRequest<{
+      Params: findByCategoryByIdParamsDto;
+      Querystring: queryParamsFindCategoryDto;
+    }>,
+    reply: FastifyReply,
+  ): Promise<void> {
+    try {
+      if (!req.params.category) throw new Error(productErrors.ERROR_CATEGORY_NAME_NOT_FOUND);
+
+      const products = await this.ProductService.findCategoryById(
+        req.params.category,
+        req.query.page,
+        req.query.limit,
+      );
+
+      if (!products) throw new Error(productErrors.ERROR_CATEGORY_NOT_FOUND);
+
+      return reply.send({ status: true, ...products }).code(HttpResponseCode.OK);
+    } catch (error) {
+      if (error instanceof Error) {
+        return reply.status(500).send({ status: false, message: error.message });
+      }
+    }
+  }
+
+  async findAllCategory(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+    try {
+      const categories = await this.ProductService.findAllCategory();
+
+      return reply.send({ status: true, categories }).code(HttpResponseCode.OK);
+    } catch (error) {
+      if (error instanceof Error) {
+        return reply.status(500).send({ status: false, message: error.message });
+      }
+    }
   }
 
   async deleteProduct(req: FastifyRequest, reply: FastifyReply): Promise<void> {
